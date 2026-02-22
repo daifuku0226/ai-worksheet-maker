@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI教材ワークシート生成メーカー</title>
+    <meta name="description" content="AIが教科・学年・テーマに合わせたワークシートを自動生成。先生の授業準備を強力にサポートします。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <!-- ===== ヘッダー ===== -->
+    <header class="app-header no-print">
+        <div class="header-inner">
+            <div class="logo">
+                <span class="logo-icon">📝</span>
+                <h1>AI教材ワークシート生成メーカー</h1>
+            </div>
+            <p class="tagline">AIがテーマに合わせたワークシートを自動生成します</p>
+        </div>
+    </header>
+
+    <main class="container no-print-hide">
+        <!-- プログレスバー -->
+        <div class="progress-bar no-print" id="progressBar">
+            <div class="progress-step active" data-step="1">
+                <div class="step-circle">1</div>
+                <span class="step-label">基本情報</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="2">
+                <div class="step-circle">2</div>
+                <span class="step-label">教科・テーマ</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="3">
+                <div class="step-circle">3</div>
+                <span class="step-label">形式・難易度</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="4">
+                <div class="step-circle">4</div>
+                <span class="step-label">プレビュー</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="5">
+                <div class="step-circle">5</div>
+                <span class="step-label">出力</span>
+            </div>
+        </div>
+
+        <!-- ===== STEP 1: 基本情報 ===== -->
+        <section class="step-panel active" id="step1">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🏫</span>
+                    <h2>STEP 1：基本情報</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="schoolName">学校名</label>
+                        <input type="text" id="schoolName" placeholder="例：○○市立△△小学校" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="teacherName">先生のお名前</label>
+                        <input type="text" id="teacherName" placeholder="例：山田 太郎" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="grade">対象学年</label>
+                        <select id="grade" class="form-select">
+                            <option value="">-- 学年を選んでください --</option>
+                            <option value="小学1年">小学1年</option>
+                            <option value="小学2年">小学2年</option>
+                            <option value="小学3年">小学3年</option>
+                            <option value="小学4年">小学4年</option>
+                            <option value="小学5年">小学5年</option>
+                            <option value="小学6年">小学6年</option>
+                            <option value="中学1年">中学1年</option>
+                            <option value="中学2年">中学2年</option>
+                            <option value="中学3年">中学3年</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div></div>
+                    <button class="btn btn-primary" onclick="goToStep(2)">次へ →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== STEP 2: 教科とテーマ ===== -->
+        <section class="step-panel" id="step2">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📚</span>
+                    <h2>STEP 2：教科とテーマ</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>教科を選んでください</label>
+                        <div class="subject-grid" id="subjectGrid">
+                            <button class="subject-chip" data-value="国語">📖 国語</button>
+                            <button class="subject-chip" data-value="算数・数学">🔢 算数・数学</button>
+                            <button class="subject-chip" data-value="理科">🔬 理科</button>
+                            <button class="subject-chip" data-value="社会">🌍 社会</button>
+                            <button class="subject-chip" data-value="英語">🔤 英語</button>
+                            <button class="subject-chip" data-value="道徳">💛 道徳</button>
+                            <button class="subject-chip" data-value="その他">📋 その他</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="theme">テーマ・単元</label>
+                        <input type="text" id="theme" placeholder="例：鎌倉時代の文化、小数のかけ算、光合成のしくみ" class="form-input">
+                        <p class="form-hint">どんなテーマでもOKです！自由に入力してください。</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">補足情報（任意）</label>
+                        <textarea id="notes" placeholder="例：教科書p.30〜35の範囲で、前回の授業の復習として" class="form-textarea"
+                            rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">← 戻る</button>
+                    <button class="btn btn-primary" onclick="goToStep(3)">次へ →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== STEP 3: 問題形式と難易度 ===== -->
+        <section class="step-panel" id="step3">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">⚙️</span>
+                    <h2>STEP 3：問題形式と難易度</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>問題形式（複数選択可）</label>
+                        <div class="format-grid" id="formatGrid">
+                            <button class="format-chip" data-value="一問一答">❓ 一問一答</button>
+                            <button class="format-chip" data-value="穴埋め問題">✏️ 穴埋め問題</button>
+                            <button class="format-chip" data-value="選択問題（4択）">🔘 選択問題（4択）</button>
+                            <button class="format-chip" data-value="○×クイズ">⭕ ○×クイズ</button>
+                            <button class="format-chip" data-value="記述式（短答）">📝 記述式（短答）</button>
+                            <button class="format-chip" data-value="記述式（長文）">📄 記述式（長文）</button>
+                            <button class="format-chip" data-value="並べ替え問題">🔀 並べ替え問題</button>
+                            <button class="format-chip" data-value="マッチング（線で結ぶ）">🔗 マッチング</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>難易度</label>
+                        <div class="difficulty-group" id="difficultyGroup">
+                            <button class="difficulty-chip" data-value="★基本">★ 基本</button>
+                            <button class="difficulty-chip" data-value="★★標準">★★ 標準</button>
+                            <button class="difficulty-chip" data-value="★★★発展">★★★ 発展</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>問題数</label>
+                        <div class="count-group" id="countGroup">
+                            <button class="count-chip" data-value="5">5問</button>
+                            <button class="count-chip" data-value="10">10問</button>
+                            <button class="count-chip" data-value="15">15問</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="worksheetTitle">ワークシートのタイトル</label>
+                        <div class="title-input-group">
+                            <input type="text" id="worksheetTitle" placeholder="タイトルを入力（空欄でAIが自動提案）" class="form-input">
+                            <button class="btn btn-small btn-accent" id="suggestTitleBtn" onclick="suggestTitle()">✨
+                                AI提案</button>
+                        </div>
+                        <div class="title-suggestions" id="titleSuggestions" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">← 戻る</button>
+                    <button class="btn btn-primary btn-generate" id="generateBtn" onclick="generateWorksheet()">
+                        <span class="btn-text">🚀 ワークシートを生成する</span>
+                        <span class="btn-loading" style="display:none;">
+                            <span class="spinner"></span> 生成中...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== STEP 4: AI生成＆プレビュー ===== -->
+        <section class="step-panel" id="step4">
+            <div class="preview-toolbar no-print">
+                <div class="toolbar-left">
+                    <button class="btn btn-secondary" onclick="goToStep(3)">← 設定に戻る</button>
+                    <button class="btn btn-accent" onclick="regenerateAll()">🔄 全部再生成</button>
+                </div>
+                <div class="toolbar-right">
+                    <label class="toolbar-label">配色テーマ：</label>
+                    <select id="colorTheme" class="form-select form-select-sm" onchange="changeColorTheme(this.value)">
+                        <option value="soft">🎨 やさしい色合い</option>
+                        <option value="mono">⬛ モノクロ</option>
+                        <option value="colorful">🌈 カラフル</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="goToStep(5)">出力へ →</button>
+                </div>
+            </div>
+
+            <!-- A4プレビュー：生徒用 -->
+            <div class="a4-preview" id="worksheetPreview">
+                <div class="a4-page theme-soft" id="studentPage">
+                    <div class="worksheet-header">
+                        <div class="worksheet-meta">
+                            <span class="school-name" id="printSchoolName"></span>
+                            <span class="teacher-name" id="printTeacherName"></span>
+                        </div>
+                        <h2 class="worksheet-title" id="printTitle"></h2>
+                        <div class="worksheet-info">
+                            <span class="grade-badge" id="printGrade"></span>
+                            <span class="subject-badge" id="printSubject"></span>
+                            <span class="difficulty-badge" id="printDifficulty"></span>
+                        </div>
+                        <div class="student-fields">
+                            <span class="student-field">年　　組</span>
+                            <span class="student-field">名前：＿＿＿＿＿＿＿＿＿＿</span>
+                        </div>
+                    </div>
+                    <div class="worksheet-problems" id="problemsContainer">
+                        <!-- 問題がここに動的に挿入される -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- A4プレビュー：教師用解答 -->
+            <div class="a4-preview" id="answerPreview">
+                <div class="a4-page theme-soft" id="answerPage">
+                    <div class="worksheet-header">
+                        <h2 class="worksheet-title"><span id="printTitleAnswer"></span>【解答】</h2>
+                    </div>
+                    <div class="worksheet-problems" id="answersContainer">
+                        <!-- 解答がここに動的に挿入される -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== STEP 5: 出力 ===== -->
+        <section class="step-panel" id="step5">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🖨️</span>
+                    <h2>STEP 5：出力</h2>
+                </div>
+                <div class="card-body output-body">
+                    <p class="output-description">ワークシートの準備ができました！印刷またはPDF保存できます。</p>
+
+                    <div class="output-actions">
+                        <button class="btn btn-primary btn-lg" onclick="printStudentWorksheet()">
+                            🖨️ 生徒用ワークシートを印刷
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="printTeacherAnswer()">
+                            👨‍🏫 解答を印刷
+                        </button>
+                        <button class="btn btn-accent btn-lg" onclick="createAnother()">
+                            📝 別の作成を開始
+                        </button>
+                    </div>
+
+                    <div class="output-tips">
+                        <h3>💡 印刷のヒント</h3>
+                        <ul>
+                            <li>ブラウザの印刷ダイアログで「PDF に保存」を選ぶとPDFファイルとして保存できます</li>
+                            <li>用紙サイズは「A4」を選んでください</li>
+                            <li>余白は「なし」または「最小」がおすすめです</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-secondary" onclick="goToStep(4)">← プレビューに戻る</button>
+                    <div></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ローディングオーバーレイ -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">AIが問題を生成しています...</p>
+            <p class="loading-subtext">少々お待ちください</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
